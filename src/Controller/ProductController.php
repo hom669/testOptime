@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Category;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Product;
+
 use App\Form\ProductType;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
@@ -16,6 +20,7 @@ use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProductController extends AbstractController
@@ -32,14 +37,19 @@ class ProductController extends AbstractController
     {
         $dataProduct = $this->getProducts();
 
-        //$tableProduct = $this->createTableProducts($request,$dataProduct,$this->dataTableFactory);
+        return $this->render('product/index.html.twig', 
+        ['controller_name' => 'Mostrar Productos','data_product' => $dataProduct]);
+    }
 
-      /*   return $this->render('product/index.html.twig', [
-            'controller_name' => 'Mostrar Productos',
-            'products' => $dataProduct,
-        ]); */
+    /**
+     * @Route("search/{filter}", name="search")
+     */
+    public function search(Request $request,$filter): Response
+    {
+        $dataProduct = $this->getProductsFilter($filter);
 
-        return $this->render('product/index.html.twig', ['controller_name' => 'Mostrar Productos','data_product' => $dataProduct]);
+        return $this->render('product/index.html.twig', 
+        ['controller_name' => 'Mostrar Productos','data_product' => $dataProduct]);
     }
 
     /**
@@ -110,6 +120,18 @@ class ProductController extends AbstractController
         ]);
 
     }
+    
+    /**
+     * @Route("/viewProduct/{product}", name="viewProduct")
+     */
+    public function viewProduct($product, Request $request): Response
+    {
+        $dataProduct = $this->getProduct($product);
+
+        return $this->render('product/view.html.twig', 
+        ['controller_name' => 'Mostrar Productos','data_product' => $dataProduct]);
+
+    }
 
      /**
      * @Route("/deletedProduct/{id_product}", name="deletedProduct")
@@ -124,6 +146,121 @@ class ProductController extends AbstractController
             'url' => '/',
             'title' => 'Eliminado'
         ]);
+    }
+
+     /**
+     * @Route("/exportProduct", name="exportProduct")
+     */
+    public function exportProduct(): Response
+    {
+        $dataProduct = $this->getProducts();
+        $spreadsheet = new Spreadsheet();
+        
+        /* @var $sheet \PhpOffice\PhpSpreadsheet\Writer\Xlsx\Worksheet */
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $styleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
+                'rotation' => 90,
+                'startColor' => [
+                    'argb' => '0080ff',
+                ],
+                'endColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+
+        $styleArrayFile = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT,
+            ],
+            'borders' => [
+                'top' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
+                'rotation' => 90,
+                'startColor' => [
+                    'argb' => 'FFA0A0A0',
+                ],
+                'endColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+        
+        $sheet->getStyle('A1:F1')->applyFromArray($styleArray);
+
+        $sheet->setCellValue('A1', 'Codigo');
+        $sheet->setCellValue('B1', 'Nombre');
+        $sheet->setCellValue('C1', 'Marca');
+        $sheet->setCellValue('D1', 'Categoria');
+        $sheet->setCellValue('E1', 'Precio');
+        $sheet->setCellValue('F1', 'Fecha Creacion');
+        
+        $line = 2;
+
+        foreach ($dataProduct as $product) {
+            $sheet->setCellValue('A'.$line, $product->getCodeProd());
+            $sheet->setCellValue('B'.$line, $product->getName());
+            $sheet->setCellValue('C'.$line, $product->getBrand());
+            $sheet->setCellValue('D'.$line, $product->getCategories()->getName());
+            $sheet->setCellValue('E'.$line, $product->getPrice());
+            $sheet->setCellValue('F'.$line, $product->getCreatedAt());
+            $line++;
+        }
+
+        $sheet->getStyle('A2:F'.$line)->applyFromArray($styleArrayFile);
+        foreach (range('A','F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+         }
+/*         while ($rows = $dataProduct) {
+            dd($rows);
+            $sheet->setCellValue('A'.$line, $rows['CodeProd']);
+            $line++;
+        } */
+
+        $sheet->setTitle("Productos Creados");
+        $sheet->getTabColor()->setRGB('FF0000');
+        
+        // Crear tu archivo de Office 2007 Excel (XLSX Formato)
+        $writer = new Xlsx($spreadsheet);
+        
+        // En este caso deseamos escribir el archivo en el directorio public del proyecto
+        $publicDirectory = $this->getParameter('kernel.project_dir').'/public';
+        // p. ej. /var/www/project/public/my_first_excel_symfony4.xlsx
+        $excelFilepath =  $publicDirectory . '/my_first_excel_symfony4.xlsx';
+        
+        // Crear el archivo y guardarlo en el directorio
+        $response =  new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            }
+        );
+
+        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
+        $response->headers->set('Content-Disposition', 'attachment;filename="ExportScan.xls"');
+        $response->headers->set('Cache-Control','max-age=0');
+        return $response;
+        
     }
     
     public function getProduct($id_product){
@@ -203,6 +340,14 @@ class ProductController extends AbstractController
         $em = $this->doctrine;
         $products = $em->getRepository(Product::class)->findBy(array('is_active' => true ));
         return $products;
+
+    }
+
+    public function getProductsFilter($filter){
+        $em = $this->doctrine;
+        $products = $em->getRepository(Product::class);
+        $resultConsult = $products->findByExampleField($filter);
+        return $resultConsult;
 
     }
 

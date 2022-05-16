@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creacion Productos
+{% endblock %}
+
+{% block body %}
+	<style>
+		body {
+			background: linear-gradient(to left, #007bff, #9198e5);
+		}
+		.form-control {
+			background: #F2F2F2;
+			border-radius: 0;
+			border: none;
+		}
+
+		input[type="hidden"] {
+			position: relative !important;
+			top: 100% !important;
+			left: 100% !important;
+		}
+	</style>
+
+	<div class="banner"></div>
+
+	<script>
+
+		Swal.fire({
+            title: "Detalle Producto",
+            html: '<b>Caracteristicas: </b><br><br> ' + '<p class="card-text"><b>Codigo:</b>  {{ data_product[0].CodeProd }}</p>' + '<p class="card-text"><b>Nombre:</b>  {{ data_product[0].name }}</p>' + '<p class="card-text"><b>Marca:</b>  {{ data_product[0].brand }}</p>' + '<p class="card-text"><b>Precio:</b>  {{ data_product[0].price }}</p>' + '<p class="card-text"><b>Fecha Creación:</b>  {{ data_product[0].createdAt|date('d-m-Y') }}</p>' + '<p class="card-text"><b>Fecha Actualización:</b>  {{ data_product[0].createdAt|date('d-m-Y') }}</p>',
+            icon: 'type',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Ok'
+            }).then((result) => {
+            if (result.isConfirmed) {
+            window.location = "/";
+            }
+        })
+	</script>
+{% endblock %}

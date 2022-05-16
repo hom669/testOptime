@@ -39,6 +39,18 @@ class ProductRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByExampleField($value): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('LOWER(p.CodeProd) LIKE LOWER(:val) or LOWER(p.name) LIKE LOWER(:val) or LOWER(p.brand) LIKE LOWER(:val)')
+            ->setParameter('val', "%".$value."%")
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Product[] Returns an array of Product objects
 //     */
