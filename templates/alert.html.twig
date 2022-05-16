@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listado de Productos
+{% endblock %}
+
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+
+		body {
+			background: linear-gradient(to left, #007bff, #9198e5);
+			width: 100%;
+		}
+	</style>
+
+	<div class="banner">
+
+	</div>
+	<script>
+
+			Swal.fire({
+			title: '{{title}}',
+			text: '{{ message }}',
+			icon: '{{type}}',
+			})
+
+            Swal.fire({
+                title: '{{title}}',
+                text: "{{ message }}",
+                icon: 'type',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location = "{{url}}";
+                }
+                })
+	</script>
+
+{% endblock %}

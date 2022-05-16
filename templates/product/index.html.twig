@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listado de Productos
+{% endblock %}
+
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+
+		body {
+			background: linear-gradient(to left, #007bff, #9198e5);
+			width: 100%;
+		}
+	</style>
+
+	<div class="banner">
+		<div class="container p-5">
+			<div class="card mx-3 mt-n5 shadow-lg" style="border-radius:0px; border:none">
+				<div class="card-body p-5">
+					<h4 class="card-title mb-3 text-dark text-uppercase" style="font-weight:700">Listado Productos</h4>
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<a class="btn btn-primary me-md-2" href="createProduct">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewbox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+							</svg>
+							Agregar Produto</a>
+						<button class="btn btn-primary me-md-2" type="button">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewbox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+							</svg>
+							Agregar Categoria</button>
+						<button class="btn btn-primary me-md-2" type="button">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewbox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+							</svg>
+							Exportar Excel</button>
+					</div>
+
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">C&oacute;digo</th>
+								<th scope="col">Nombre</th>
+								<th scope="col">Marca</th>
+								<th scope="col">Categoria</th>
+								<th scope="col">Acciones</th>
+
+							</tr>
+						</thead>
+						<tbody>
+							{% if data_product %}
+								{% for product in data_product %}
+									<tr>
+										<th scope="row">{{product.id}}</th>
+										<td>{{product.CodeProd}}</td>
+										<td>{{product.name}}</td>
+										<td>{{product.brand}}</td>
+										<td>{{product.categories.name}}</td>
+										<td>
+											<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+												<a href="/viewsProduct/{{product.id}}" type="button" class="btn btn-success">
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewbox="0 0 16 16">
+														<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+														<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+													</svg>
+													Ver</a>
+												<a href="/editProduct/{{product.id}}" type="button" class="btn btn-secondary">
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewbox="0 0 16 16">
+														<path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
+													</svg>
+													Editar</a>
+												<a onclick="deletedProduct()" class="btn btn-danger">
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+														<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+													</svg>
+													Eliminar</a>
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+							{% else %}
+								<tr>
+									<td colspan="6">Sin Información de Productos</td>
+								</tr>
+							{% endif %}
+
+						</tbody>
+					</table>
+
+
+				</div>
+
+			</div>
+		</div>
+
+
+	</div>
+	<script>
+		function deletedProduct() {
+			Swal.fire({
+			title: 'Eliminar',
+			text: "Desea Eliminar Producto!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#d33',
+			cancelButtonColor: '#3085d6',
+			confirmButtonText: 'Si, Eliminar!'
+			}).then((result) => {
+			if (result.isConfirmed) {
+				window.location = "/deletedProduct/"+"1";
+			}
+			})
+		}
+	</script>
+
+{% endblock %}

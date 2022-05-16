@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creacion Productos
+{% endblock %}
+
+{% block body %}
+	<style>
+		body {
+			background: linear-gradient(to left, #007bff, #9198e5);
+		}
+		.form-control {
+			background: #F2F2F2;
+			border-radius: 0;
+			border: none;
+		}
+
+		input[type="hidden"] {
+			position: relative !important;
+			top: 100% !important;
+			left: 100% !important;
+		}
+	</style>
+
+	{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+	<div class="banner">
+		<div class="container p-5">
+			<div class="card mx-3 mt-n5 shadow-lg" style="border-radius:0px; border:none">
+				<div class="card-body p-5">
+					<h4 class="card-title mb-3 text-dark text-uppercase" style="font-weight:700">Creaci&oacute;n Producto</h4>
+
+					{% if flash_message %}
+
+						<div class="alert alert-success alert-success fade show" role="alert">
+							<strong>Creado!!</strong>
+							{{flash_message}}
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+						</div>
+					{% endif %}
+
+					<div class="row">
+						<div class="col">
+							<div class="form-floating mb-3">
+								{{form_row(form.CodeProd)}}
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-floating mb-3">
+								{{form_row(form.name)}}
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<div class="form-floating mb-3">
+								{{form_row(form.brand)}}
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-floating mb-3">
+								{{form_row(form.price)}}
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<div class="form-floating mb-3">
+								{{
+									form_row(form.categories)
+								}}
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-floating mb-3">
+							{{ form_errors(form) }}
+							</div>
+						</div>
+					</div>
+					<div class="text-center">
+
+						{{form_row(form.Guardar)}}
+						<a href="/" class="btn btn-danger">Cancelar</a>
+						<a href="/" class="btn btn-warning">Crear Categorias</a>
+
+					</div>
+
+				</div>
+			</div>
+
+
+		</div>
+		
+
+		{{ form_end(form) }}
+
+
+	{% endblock %}
